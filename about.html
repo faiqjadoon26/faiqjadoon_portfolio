@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>about.sh | Faiq Terminal</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --hacker-green: #00ff41;
+      --accent-red: #e63946;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      margin:0;
+      font-family:"JetBrains Mono",monospace;
+      background: radial-gradient(circle at 10% 20%, rgba(0,255,65,0.1), transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(0,255,65,0.1), transparent 40%),
+                  #000;
+      color:var(--hacker-green);
+      min-height:100vh;
+      overflow:hidden;
+      position:relative;
+    }
+    body::before {
+      content:"";
+      position:fixed; inset:0;
+      background:repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,255,65,0.05) 2px,
+        rgba(0,255,65,0.05) 4px
+      );
+      pointer-events:none;
+      z-index:2;
+    }
+    .scanline{
+      position:fixed;top:0;left:0;width:100%;height:6px;
+      background:linear-gradient(to bottom,rgba(0,255,65,0.6),rgba(0,255,65,0.1),transparent);
+      animation:scan 7s linear infinite;z-index:3;
+    }
+    @keyframes scan{0%{top:0%}100%{top:100%}}
+
+    header {
+      padding:0.75rem 1.5rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(0,255,65,0.4);
+      background:rgba(0,0,0,0.85);
+      backdrop-filter:blur(4px);
+      position:sticky;
+      top:0;
+      z-index:4;
+    }
+    .brand{display:flex;align-items:center;gap:0.6rem;}
+    .brand-logo{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,255,65,0.8));}
+    .brand-name{font-size:0.9rem;letter-spacing:0.08em;}
+    nav{display:flex;gap:1rem;font-size:0.85rem;}
+    nav a{color:var(--hacker-green);text-decoration:none;opacity:0.7;padding:0.2rem 0.55rem;border-radius:4px;border:1px solid transparent;transition:0.2s;}
+    nav a:hover{opacity:1;border-color:rgba(0,255,65,0.6);background:rgba(0,255,65,0.12);}
+    nav a.active{opacity:1;border-color:var(--hacker-green);background:rgba(0,255,65,0.2);}
+    .wrapper{position:relative;z-index:1;min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+    .terminal{width:100%;max-width:960px;height:75vh;max-height:540px;background:rgba(0,0,0,0.95);border-radius:10px;border:1px solid rgba(0,255,65,0.8);box-shadow:0 0 26px rgba(0,255,65,0.4);display:flex;flex-direction:column;overflow:hidden;}
+    .terminal-header{display:flex;align-items:center;justify-content:space-between;padding:0.45rem 0.85rem;background:#020804;border-bottom:1px solid rgba(0,255,65,0.7);font-size:0.8rem;}
+    .window-dots{display:flex;gap:0.3rem;}
+    .dot{width:10px;height:10px;border-radius:50%;background:#333;}
+    .dot.red{background:#ff5f56}.dot.yellow{background:#ffbd2d}.dot.green{background:#27c93f}
+    .header-title{color:#b7ffd0;}
+    .header-meta{color:#79f9a2;}
+    .terminal-body{flex:1;padding:0.75rem 0.9rem;font-size:0.86rem;overflow-y:auto;}
+    .line{white-space:pre-wrap;word-break:break-word;margin-bottom:0.1rem;}
+    .line.system{color:#7bf8a3;}
+    .line.title{color:#c7ffe2;font-weight:600;}
+    .line.error{color:var(--accent-red);}
+    .prompt-frag{color:#92ffc0;}
+    .prompt-path{color:#5fee97;}
+    .cmd{color:var(--hacker-green);font-weight:600;}
+    .terminal-input{border-top:1px solid rgba(0,255,65,0.7);padding:0.5rem 0.8rem;display:flex;align-items:center;gap:0.4rem;background:#000;font-size:0.86rem;}
+    #inputField{background:transparent;border:none;outline:none;color:var(--hacker-green);font-family:inherit;font-size:inherit;flex:1;}
+    #inputField::placeholder{color:rgba(0,255,65,0.4);}
+    footer{text-align:center;font-size:0.75rem;color:#7bf8a3;opacity:0.8;padding-bottom:0.6rem;}
+    .term-img-wrap{margin:0.7rem 0;display:flex;justify-content:center;}
+    .term-img{max-width:45%;border-radius:6px;border:1px solid rgba(0,255,65,0.7);box-shadow:0 0 18px rgba(0,255,65,0.5);object-fit:cover;}
+    @media(max-width:700px){
+      .wrapper{padding:1rem;}
+      .terminal{height:72vh;}
+      .term-img{max-width:70%;}
+      header{flex-direction:column;align-items:flex-start;gap:0.4rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+
+  <header>
+    <div class="brand">
+      <img src="logo.png" class="brand-logo" alt="logo">
+      <span class="brand-name">about.sh // FAIQ_JADOON</span>
+    </div>
+    <nav>
+      <a href="index.html">home.sh</a>
+      <a href="about.html" class="active">about.sh</a>
+      <a href="projects.html">projects.sh</a>
+      <a href="resume.html">resume.sh</a>
+      <a href="contact.html">contact.sh</a>
+    </nav>
+  </header>
+
+  <div class="wrapper">
+    <section class="terminal">
+      <div class="terminal-header">
+        <div class="window-dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="header-title">/home/faiq/about_me.sh</div>
+        <div class="header-meta" id="uptime">session: 00:00</div>
+      </div>
+
+      <div class="terminal-body" id="terminalBody"></div>
+
+      <div class="terminal-input">
+        <span class="prompt-frag">visitor@about</span>:<span class="prompt-path">~</span>$ 
+        <input id="inputField" placeholder="wait for boot... or type 'help'" autocomplete="off" />
+      </div>
+    </section>
+  </div>
+
+  <footer>© 2025 Faiq Jadoon — About Terminal</footer>
+
+  <script>
+    const bootLines = [
+      "[AUTH] verifying visitor identity...",
+      "[OK]   access level: guest",
+      "[LOAD] decrypting about_me module...",
+      "[....] loading bio, skills, experience...",
+      "[OK]   module loaded successfully.",
+      "",
+      "Spawning about terminal..."
+    ];
+
+    const aboutContent = [
+      "",
+      "<span class='line title'>> about.faiq()</span>",
+      "",
+      "<div class='term-img-wrap'><img src='profile.jpg' alt='Faiq Jadoon' class='term-img'></div>",
+      "",
+      "Name:   <span class='cmd'>Faiq Jadoon</span>",
+      "Role:   Student • Programmer • Digital Marketer • Instructor",
+      "",
+      "I mix <span class='cmd'>Python programming</span>, <span class='cmd'>digital marketing</span>,",
+      "and <span class='cmd'>teaching</span> to build tools and help others learn.",
+      "",
+      "Highlights:",
+      "  • Led programming clubs and IT societies, teaching Python to 45+ students.",
+      "  • Built real projects: face recognition attendance, typing simulators, GUIs.",
+      "  • Managed social media pages and campaigns to grow online presence.",
+      "  • Participated in hackathons building tools to support student decisions.",
+      "",
+      "Philosophy:",
+      "  \"Write clean code. Help people. Build things that actually matter.\"",
+      "",
+      "Type 'skills' for a breakdown or 'clear' to reset screen."
+    ];
+
+    const skillsContent = [
+      "",
+      "<span class='line title'>> about.skills()</span>",
+      "",
+      "Programming:",
+      "  - Python (OOP, data structures, algorithms)",
+      "  - Web scraping, NumPy, Pandas",
+      "  - GUI: Tkinter, Pygame",
+      "",
+      "Digital Marketing:",
+      "  - SEO, social media management",
+      "  - Content creation, ads, analytics & budgeting",
+      "",
+      "Soft Skills:",
+      "  - Leadership, mentoring, teamwork",
+      "  - Project management & community engagement"
+    ];
+
+    const bodyEl = document.getElementById("terminalBody");
+    const inputEl = document.getElementById("inputField");
+    const uptimeEl = document.getElementById("uptime");
+
+    function printLine(text, cls) {
+      const div = document.createElement("div");
+      div.className = "line" + (cls ? " " + cls : "");
+      div.innerHTML = text;
+      bodyEl.appendChild(div);
+      bodyEl.scrollTop = bodyEl.scrollHeight;
+    }
+
+    function bootSequence() {
+      let i = 0;
+      function step() {
+        if (i < bootLines.length) {
+          printLine(bootLines[i], "system");
+          i++;
+          setTimeout(step, 260);
+        } else {
+          aboutContent.forEach(l => printLine(l));
+        }
+      }
+      step();
+    }
+
+    function handleCommand(raw) {
+      const input = raw.trim();
+      if (!input) return;
+
+      printLine(
+        `<span class="prompt-frag">visitor@about</span>:<span class="prompt-path">~</span>$ <span class="cmd">${input}</span>`
+      );
+
+      if (input === "help") {
+        printLine("", "");
+        printLine("Available commands:", "system");
+        printLine("  help      - show this help", "system");
+        printLine("  skills    - show skill breakdown", "system");
+        printLine("  clear     - clear this screen", "system");
+        printLine("  home      - go back to home terminal", "system");
+        printLine("  projects  - jump to projects terminal", "system");
+      } else if (input === "skills") {
+        skillsContent.forEach(l => printLine(l));
+      } else if (input === "clear") {
+        bodyEl.innerHTML = "";
+      } else if (input === "home") {
+        window.location.href = "index.html";
+      } else if (input === "projects") {
+        window.location.href = "projects.html";
+       } else if (input === "resume") {
+        window.location.href = "resume.html";
+      } else {
+        printLine(`<span class="line error">command not found: ${input}</span>`);
+      }
+    }
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const val = inputEl.value;
+        inputEl.value = "";
+        handleCommand(val);
+      }
+    });
+
+    document.addEventListener("click", () => inputEl.focus());
+
+    bootSequence();
+
+    const start = Date.now();
+    setInterval(() => {
+      const diff = Math.floor((Date.now() - start) / 1000);
+      const m = String(Math.floor(diff / 60)).padStart(2, "0");
+      const s = String(diff % 60).padStart(2, "0");
+      uptimeEl.textContent = "session: " + m + ":" + s;
+    }, 1000);
+  </script>
+</body>
+</html>

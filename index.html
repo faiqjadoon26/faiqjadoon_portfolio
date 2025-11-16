@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faiq Jadoon | Terminal Portfolio</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #050505;
+      --terminal-bg: #020202;
+      --terminal-border: #00ff41;
+      --terminal-text: #00ff41;
+      --terminal-subtext: #c0c0c0;
+      --accent: #e63946;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "JetBrains Mono", monospace;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(0,255,65,0.08) 0%, transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(0,255,65,0.08) 0%, transparent 30%),
+        #000;
+      color: var(--terminal-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0),
+        rgba(0,0,0,0) 2px,
+        rgba(0,255,65,0.04) 3px,
+        rgba(0,255,65,0.04) 4px
+      );
+      mix-blend-mode: soft-light;
+      z-index: -1;
+    }
+
+    header {
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,255,65,0.3);
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(0,255,65,0.7));
+    }
+
+    .brand-name {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    nav a {
+      color: var(--terminal-text);
+      text-decoration: none;
+      opacity: 0.7;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      opacity: 1;
+      border-color: rgba(0,255,65,0.4);
+      background: rgba(0,255,65,0.08);
+    }
+
+    nav a.active {
+      opacity: 1;
+      border-color: var(--terminal-border);
+      background: rgba(0,255,65,0.15);
+    }
+
+    .wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .terminal {
+      max-width: 1000px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--terminal-border);
+      background:
+        radial-gradient(circle at 0 0, rgba(0,255,65,0.16) 0, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(0,255,65,0.12) 0, transparent 55%),
+        var(--terminal-bg);
+      box-shadow: 0 0 25px rgba(0,255,65,0.3), 0 0 80px rgba(0,0,0,0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 0.75rem;
+      border-bottom: 1px solid rgba(0,255,65,0.35);
+      background: linear-gradient(to right, #050505, #101010);
+      font-size: 0.75rem;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+
+    .terminal-title {
+      opacity: 0.8;
+    }
+
+    .terminal-body {
+      padding: 0.75rem 1rem 1rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      max-height: 70vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      flex: 1;
+    }
+
+    .line {
+      display: block;
+      margin-bottom: 0.1rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .line.system {
+      color: var(--accent);
+    }
+
+    .line.comment {
+      color: var(--terminal-subtext);
+    }
+
+    .command-line {
+      color: #e0ffe5;
+    }
+
+    .prompt-frag {
+      color: var(--terminal-text);
+    }
+
+    .prompt-path {
+      color: #3dbb67;
+    }
+
+    .terminal-image-wrapper {
+      margin: 0.75rem 0 1rem;
+      text-align: center;
+    }
+
+    .terminal-image {
+      max-width: 180px;
+      border-radius: 6px;
+      border: 1px solid var(--terminal-border);
+      box-shadow: 0 0 18px rgba(0,255,65,0.4);
+      display: block;
+      margin: 0 auto;
+      background: #000;
+      padding: 0.5rem;
+    }
+
+    .terminal-image-caption {
+      font-size: 0.75rem;
+      color: var(--terminal-subtext);
+      margin-top: 0.3rem;
+    }
+
+    .terminal-input {
+      border-top: 1px solid rgba(0,255,65,0.35);
+      padding: 0.6rem 1rem 0.7rem;
+      background: rgba(0,0,0,0.9);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    #inputField {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--terminal-text);
+      font-family: inherit;
+      font-size: inherit;
+      flex: 1;
+    }
+
+    #inputField::placeholder {
+      color: rgba(0,255,65,0.4);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--terminal-subtext);
+      padding-bottom: 0.75rem;
+      opacity: 0.65;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      nav {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .wrapper {
+        padding: 1.5rem 0.5rem 2rem;
+      }
+      .terminal-body {
+        max-height: 65vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="FJ Logo" class="brand-logo" />
+      <span class="brand-name">FAIQ JADOON // DEV_CONSOLE</span>
+    </div>
+    <nav>
+      <a href="index.html" class="active">home.sh</a>
+      <a href="about.html">about.sh</a>
+      <a href="projects.html">projects.sh</a>
+      <a href="resume.html">resume.sh</a>
+      <a href="contact.html">contact.sh</a>
+    </nav>
+  </header>
+
+  <div class="wrapper">
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="traffic-lights">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="terminal-title">/dev/portfolio/home.sh — bash</div>
+        <div style="opacity:0.6;">UTF-8</div>
+      </div>
+
+      <div class="terminal-body" id="terminal-output"></div>
+
+      <div class="terminal-input">
+        <span class="prompt-frag">faiq@terminal</span>
+        <span class="prompt-path">:~/portfolio$</span>&nbsp;
+        <input
+          id="inputField"
+          type="text"
+          autocomplete="off"
+          placeholder="type 'help' (commands: help, about, projects, resume, contact, clear)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2025 Faiq Jadoon — rendered in hacker mode.</footer>
+
+  <script>
+    const outputEl = document.getElementById("terminal-output");
+    const inputEl = document.getElementById("inputField");
+
+    // ---- boot sequence (no projects shown here) ----
+    const bootSequence = [
+      { type: "system", text: "[BOOT] Initializing developer environment...", delay: 600 },
+      { type: "system", text: "[OK] Secure local session started from 127.0.0.1", delay: 700 },
+      { type: "system", text: "[OK] Loading user profile: faiq_jadoon", delay: 600 },
+      {
+        type: "cmd",
+        text: "whoami",
+        output: "faiq_jadoon  // student, programmer, and builder of hacker-style tools",
+        delay: 900
+      },
+      {
+        type: "cmd",
+        text: "hostnamectl",
+        output: [
+          "Static hostname: faiq-terminal",
+          "Icon name: dev-machine",
+          "Chassis: laptop",
+          "Operating System: Python / Web Hybrid Workspace"
+        ],
+        delay: 900
+      },
+      {
+        type: "comment",
+        text: "# rendering identity badge...",
+        delay: 700
+      },
+      {
+        type: "image",
+        src: "logo.png",
+        alt: "Faiq Jadoon Logo",
+        caption: "IDENTITY: logo loaded successfully.",
+        delay: 900
+      },
+      {
+        type: "comment",
+        text: "# loading short bio...",
+        delay: 600
+      },
+      {
+        type: "line",
+        text: ">> I enjoy writing Python scripts, desktop tools, and interfaces that feel like real terminals.",
+        delay: 800
+      },
+      {
+        type: "line",
+        text: ">> I like combining programming with digital skills: automation, GUI apps, and teaching others.",
+        delay: 800
+      },
+      {
+        type: "cmd",
+        text: "ls",
+        output: "about.txt  projects/  resume.pdf  contact.cfg",
+        delay: 900
+      },
+      {
+        type: "line",
+        text: "Hint: use the navigation above or type commands below (try: help, about, projects, resume, contact).",
+        delay: 800
+      },
+      {
+        type: "line",
+        text: "Note: project details are revealed only inside projects.sh, not on the home console.",
+        delay: 0
+      }
+    ];
+
+    function appendLine(text, cssClass = "") {
+      const line = document.createElement("div");
+      line.className = "line" + (cssClass ? " " + cssClass : "");
+      line.textContent = text;
+      outputEl.appendChild(line);
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+
+    function appendCommand(promptText, command) {
+      const line = document.createElement("div");
+      line.className = "line command-line";
+      line.innerHTML =
+        `<span class="prompt-frag">faiq@terminal</span>` +
+        `<span class="prompt-path">:~/portfolio$</span> ` +
+        `<span>${command}</span>`;
+      outputEl.appendChild(line);
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+
+    function appendImage(step) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "terminal-image-wrapper";
+
+      const img = document.createElement("img");
+      img.className = "terminal-image";
+      img.src = step.src;
+      img.alt = step.alt || "";
+
+      const caption = document.createElement("div");
+      caption.className = "terminal-image-caption";
+      caption.textContent = step.caption || "";
+
+      wrapper.appendChild(img);
+      if (step.caption) wrapper.appendChild(caption);
+
+      outputEl.appendChild(wrapper);
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+
+    function playBootSequence(index = 0) {
+      if (index >= bootSequence.length) return;
+      const step = bootSequence[index];
+
+      const next = () => {
+        setTimeout(() => playBootSequence(index + 1), step.delay || 500);
+      };
+
+      if (step.type === "system") {
+        appendLine(step.text, "system");
+        next();
+      } else if (step.type === "comment") {
+        appendLine(step.text, "comment");
+        next();
+      } else if (step.type === "line") {
+        appendLine(step.text);
+        next();
+      } else if (step.type === "cmd") {
+        appendCommand("faiq@terminal:~/portfolio$", step.text);
+        if (Array.isArray(step.output)) {
+          step.output.forEach(line => appendLine("  " + line));
+        } else if (step.output) {
+          appendLine("  " + step.output);
+        }
+        next();
+      } else if (step.type === "image") {
+        appendImage(step);
+        next();
+      } else {
+        next();
+      }
+    }
+
+    // ---- handle real user commands ----
+    function handleUserCommand(raw) {
+      const input = raw.trim();
+      if (!input) return;
+
+      // echo the command
+      appendCommand("faiq@terminal:~/portfolio$", input);
+
+      if (input === "help") {
+        appendLine("");
+        appendLine("Available commands:", "system");
+        appendLine("  help     - show this help", "system");
+        appendLine("  about    - open about.sh", "system");
+        appendLine("  projects - open projects.sh", "system");
+        appendLine("  resume   - open resume.sh", "system");
+        appendLine("  contact  - open contact.sh", "system");
+        appendLine("  clear    - clear the screen", "system");
+      } else if (input === "about") {
+        window.location.href = "about.html";
+      } else if (input === "projects") {
+        window.location.href = "projects.html";
+      } else if (input === "resume") {
+        window.location.href = "resume.html";
+      } else if (input === "contact") {
+        window.location.href = "contact.html";
+      } else if (input === "clear") {
+        outputEl.innerHTML = "";
+      } else {
+        appendLine(`command not found: ${input}`, "system");
+      }
+    }
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const val = inputEl.value;
+        inputEl.value = "";
+        handleUserCommand(val);
+      }
+    });
+
+    document.addEventListener("click", () => inputEl.focus());
+
+    window.addEventListener("load", () => {
+      playBootSequence(0);
+      inputEl.focus();
+    });
+  </script>
+</body>
+</html>

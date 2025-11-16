@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>human_typing_simulator.py | Faiq Terminal</title>
+  <link rel="icon" type="image/png" href="logo.PNG" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --green:#00ff41;
+      --red:#ff4b4b;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:"JetBrains Mono",monospace;
+      background:#000;
+      color:var(--green);
+      overflow:hidden;
+    }
+    .scanline{
+      position:fixed;top:0;left:0;width:100%;height:4px;
+      background:linear-gradient(to bottom,rgba(0,255,65,0.4),rgba(0,255,65,0.1),transparent);
+      animation:scan 7s linear infinite;
+      pointer-events:none;
+    }
+    @keyframes scan{0%{top:0}100%{top:100%}}
+
+    header{
+      padding:12px 20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(0,255,65,0.4);
+      background:#000;
+      position:sticky;top:0;z-index:10;
+    }
+    header img{
+      width:40px;
+      filter:drop-shadow(0 0 8px var(--green));
+    }
+    nav a{
+      color:var(--green);
+      margin-left:16px;
+      text-decoration:none;
+      opacity:.8;
+      transition:.2s;
+    }
+    nav a:hover{
+      opacity:1;
+      text-shadow:0 0 8px var(--green);
+    }
+
+    .window{
+      width:90%;
+      height:78vh;
+      margin:30px auto;
+      border:1px solid rgba(0,255,65,.4);
+      background:#020402;
+      box-shadow:0 0 20px rgba(0,255,65,.4);
+      border-radius:8px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    .titlebar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:8px 15px;
+      border-bottom:1px solid rgba(0,255,65,.4);
+      background:#010801;
+      font-size:.85rem;
+    }
+    .dots{display:flex;gap:6px;}
+    .dot{width:10px;height:10px;border-radius:50%;}
+    .dot.red{background:#ff5f57}
+    .dot.yellow{background:#febc2e}
+    .dot.green{background:#28c840}
+
+    #terminal{
+      flex:1;
+      padding:15px;
+      overflow-y:auto;
+      font-size:.9rem;
+      line-height:1.3rem;
+    }
+    .line{margin-bottom:4px;}
+    .system{color:var(--red);}
+    .success{color:#6aff8c;}
+    .section{text-decoration:underline;}
+
+    .project-img{
+      width:100%;
+      max-width:520px;
+      margin:12px 0;
+      border:1px solid rgba(0,255,65,.4);
+      border-radius:6px;
+      box-shadow:0 0 12px rgba(0,255,65,.4);
+      display:block;
+    }
+
+    .inputbar{
+      border-top:1px solid rgba(0,255,65,.4);
+      padding:8px 12px;
+      display:flex;
+      gap:6px;
+      background:#000;
+      font-size:.9rem;
+    }
+    #cmd{
+      flex:1;
+      background:transparent;
+      outline:none;
+      border:none;
+      color:var(--green);
+      font-family:inherit;
+      font-size:.9rem;
+    }
+
+    @media(max-width:600px){
+      header{flex-direction:column;gap:8px;align-items:flex-start;}
+      .window{width:95%;margin:18px auto;}
+    }
+  </style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="logo.PNG" alt="Logo">
+    <span>FAIQ JADOON</span>
+  </div>
+  <nav>
+    <a href="index.html">home.sh</a>
+    <a href="about.html">about.sh</a>
+    <a href="projects.html">projects.sh</a>
+    <a href="resume.html">resume.sh</a>
+    <a href="contact.html">contact.sh</a>
+  </nav>
+</header>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="dots">
+      <div class="dot red"></div>
+      <div class="dot yellow"></div>
+      <div class="dot green"></div>
+    </div>
+    <span>/projects/human_typing_simulator.py</span>
+    <span id="timer">session: 00:00</span>
+  </div>
+
+  <div id="terminal"></div>
+
+  <div class="inputbar">
+    <span>visitor@projects:~/typing_sim</span><span>$</span>
+    <input id="cmd" autocomplete="off"
+           placeholder="help, info, run, clear, home, about, projects, resume, contact">
+  </div>
+</div>
+
+<script>
+  const term = document.getElementById("terminal");
+  const cmd  = document.getElementById("cmd");
+  const timer = document.getElementById("timer");
+
+  function print(text, cls=""){
+    const div = document.createElement("div");
+    div.className = "line " + cls;
+    div.textContent = text;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  function boot(){
+    const steps = [
+      () => print("[BOOT] loading human_typing_simulator.py ...","system"),
+      () => print("[OK]   Tkinter UI initialised"),
+      () => print("[OK]   keyboard / pyautogui hooks ready"),
+      () => print("[OK]   delay + mistake settings loaded"),
+      () => print(""),
+      () => print("Type 'help' to see commands.")
+    ];
+    steps.forEach((fn,i)=>setTimeout(fn,i*350));
+
+    const start = Date.now();
+    setInterval(()=>{
+      const s = Math.floor((Date.now()-start)/1000);
+      const m = String(Math.floor(s/60)).padStart(2,"0");
+      const se = String(s%60).padStart(2,"0");
+      timer.textContent = `session: ${m}:${se}`;
+    },1000);
+  }
+
+  function info(){
+    print("");
+    print("Name:  Human Typing Simulator");
+    print("Stack: Python, Tkinter, keyboard/pyautogui");
+    print("");
+    print("Description:");
+    print("  A tool that types your text into Google Docs (or any text field)");
+    print("  with realistic human timing. It uses random delays and optional");
+    print("  mistakes/backspaces to mimic natural typing instead of a bot.");
+    print("");
+    print("Key features:");
+    print("  • GUI to paste or write the text you want to type");
+    print("  • Min / max delay between key presses");
+    print("  • Configurable mistake chance with automatic backspace fix");
+    print("  • Works in Google Docs, Word, or any focused text box");
+    print("  • Pausable / controllable from the desktop");
+    print("");
+    print("Useful commands:");
+    print("  help     → show this help");
+    print("  info     → display project summary");
+    print("  run      → simulate starting the typing process");
+    print("  clear    → clear the terminal screen");
+    print("  home     → go to home.sh");
+    print("  about    → go to about.sh");
+    print("  projects → go to projects.sh");
+    print("  resume   → open resume.sh");
+    print("  contact  → open contact.sh");
+    print("");
+
+    const img = document.createElement("img");
+    img.src = "typing-simulator.png";   // change if your file name is different
+    img.alt = "Human Typing Simulator UI";
+    img.className = "project-img";
+    term.appendChild(img);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  function runDemo(){
+    print("[RUN] python human_typing_simulator.py","system");
+    setTimeout(()=>print("[INFO] window opened: paste your text and switch to Google Docs."),600);
+    setTimeout(()=>print("[TYPE] H e l l o   w o r l d ...","success"),1400);
+    setTimeout(()=>print("[MISTAKE] simulated typo → backspace → corrected.","success"),2100);
+    setTimeout(()=>print("[INFO] demo finished. (real app keeps typing full text)."),2600);
+  }
+
+  function handleCommand(c){
+    print("visitor@projects:~/typing_sim$ " + c);
+    if(c==="help"){
+      print("");
+      print("Commands:");
+      print("  help, info, run, clear, home, about, projects, resume, contact");
+    } else if(c==="info"){
+      info();
+    } else if(c==="run"){
+      runDemo();
+    } else if(c==="clear"){
+      term.innerHTML = "";
+    } else if(c==="home"){
+      window.location="index.html";
+    } else if(c==="about"){
+      window.location="about.html";
+    } else if(c==="projects"){
+      window.location="projects.html";
+    } else if(c==="resume"){
+      window.location="resume.html";
+    } else if(c==="contact"){
+      window.location="contact.html";
+    } else {
+      print("command not found: " + c,"system");
+    }
+  }
+
+  cmd.addEventListener("keydown", e=>{
+    if(e.key==="Enter"){
+      const c = cmd.value.trim();
+      cmd.value = "";
+      if(c) handleCommand(c);
+    }
+  });
+
+  document.addEventListener("click", e=>{
+    if(e.target !== cmd){ cmd.focus(); }
+  });
+
+  window.onload = ()=>{
+    boot();
+    cmd.focus();
+  };
+</script>
+</body>
+</html>

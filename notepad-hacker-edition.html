@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>notepad_hacker_edition.py | Faiq Terminal</title>
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --hacker-green:#00ff41; --accent-red:#e63946; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:"JetBrains Mono",monospace;
+      background:
+        radial-gradient(circle at 10% 20%,rgba(0,255,65,0.1),transparent 40%),
+        radial-gradient(circle at 90% 80%,rgba(0,255,65,0.1),transparent 40%),
+        #000;
+      color:var(--hacker-green);
+      min-height:100vh;
+      overflow:hidden;
+      position:relative;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.05) 2px,rgba(0,255,65,0.05) 4px);
+      pointer-events:none;z-index:2;
+    }
+    .scanline{position:fixed;top:0;left:0;width:100%;height:6px;background:linear-gradient(to bottom,rgba(0,255,65,0.6),rgba(0,255,65,0.1),transparent);animation:scan 7s linear infinite;z-index:3;}
+    @keyframes scan{0%{top:0%}100%{top:100%}}
+
+    header{
+      padding:0.75rem 1.5rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(0,255,65,0.4);
+      background:rgba(0,0,0,0.85);
+      backdrop-filter:blur(4px);
+      position:sticky;
+      top:0;
+      z-index:4;
+    }
+    .brand{display:flex;align-items:center;gap:0.6rem;}
+    .brand-logo{width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,255,65,0.8));}
+    .brand-name{font-size:0.9rem;letter-spacing:0.08em;}
+    nav{display:flex;gap:1rem;font-size:0.85rem;}
+    nav a{color:var(--hacker-green);text-decoration:none;opacity:0.7;padding:0.2rem 0.55rem;border-radius:4px;border:1px solid transparent;transition:0.2s;}
+    nav a:hover{opacity:1;border-color:rgba(0,255,65,0.6);background:rgba(0,255,65,0.12);}
+    nav a.active{opacity:1;border-color:var(--hacker-green);background:rgba(0,255,65,0.2);}
+
+    .wrapper{position:relative;z-index:1;min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+    .terminal{
+      width:100%;max-width:960px;height:75vh;max-height:540px;
+      background:rgba(0,0,0,0.95);
+      border-radius:10px;
+      border:1px solid rgba(0,255,65,0.8);
+      box-shadow:0 0 26px rgba(0,255,65,0.4);
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .terminal-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0.45rem 0.85rem;
+      background:#020804;
+      border-bottom:1px solid rgba(0,255,65,0.7);
+      font-size:0.8rem;
+    }
+    .window-dots{display:flex;gap:0.3rem;}
+    .dot{width:10px;height:10px;border-radius:50%;background:#333;}
+    .dot.red{background:#ff5f56}.dot.yellow{background:#ffbd2d}.dot.green{background:#27c93f}
+    .header-title{color:#b7ffd0;}
+    .header-meta{color:#79f9a2;}
+
+    .terminal-body{flex:1;padding:0.75rem 0.9rem;font-size:0.86rem;overflow-y:auto;}
+    .line{white-space:pre-wrap;word-break:break-word;margin-bottom:0.1rem;}
+    .line.system{color:#7bf8a3;}
+    .line.title{color:#c7ffe2;font-weight:600;}
+    .line.error{color:var(--accent-red);}
+
+    .prompt-frag{color:#92ffc0;}
+    .prompt-path{color:#5fee97;}
+    .cmd{color:var(--hacker-green);font-weight:600;}
+
+    .terminal-input{
+      border-top:1px solid rgba(0,255,65,0.7);
+      padding:0.5rem 0.8rem;
+      display:flex;align-items:center;gap:0.4rem;
+      background:#000;font-size:0.86rem;
+    }
+    #inputField{
+      background:transparent;border:none;outline:none;
+      color:var(--hacker-green);font-family:inherit;font-size:inherit;flex:1;
+    }
+    #inputField::placeholder{color:rgba(0,255,65,0.4);}
+    footer{text-align:center;font-size:0.75rem;color:#7bf8a3;opacity:0.8;padding-bottom:0.6rem;}
+
+    .term-img-wrap{margin:0.7rem 0;display:flex;justify-content:center;}
+    .term-img{max-width:70%;border-radius:6px;border:1px solid rgba(0,255,65,0.7);box-shadow:0 0 18px rgba(0,255,65,0.5);object-fit:cover;}
+
+    a.link{color:var(--hacker-green);text-decoration:none;border-bottom:1px dashed rgba(0,255,65,0.7);}
+    a.link:hover{text-shadow:0 0 6px var(--hacker-green);}
+
+    @media(max-width:700px){
+      .wrapper{padding:1rem;}
+      .terminal{height:72vh;}
+      .term-img{max-width:95%;}
+      header{flex-direction:column;align-items:flex-start;gap:0.4rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+
+  <header>
+    <div class="brand">
+      <img src="logo.png" class="brand-logo" alt="logo">
+      <span class="brand-name">notepad_hacker_edition.py // PROJECT</span>
+    </div>
+    <nav>
+      <a href="index.html">home.sh</a>
+      <a href="about.html">about.sh</a>
+      <a href="projects.html">projects.sh</a>
+      <a href="resume.html">resume.sh</a>
+      <a href="contact.html">contact.sh</a>
+    </nav>
+  </header>
+
+  <div class="wrapper">
+    <section class="terminal">
+      <div class="terminal-header">
+        <div class="window-dots">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="header-title">/home/faiq/projects/notepad_hacker_edition.py</div>
+        <div class="header-meta" id="uptime">session: 00:00</div>
+      </div>
+
+      <div class="terminal-body" id="terminalBody"></div>
+
+      <div class="terminal-input">
+        <span class="prompt-frag">visitor@projects</span>:<span class="prompt-path">~/notepad_hacker_edition</span>$ 
+        <input id="inputField" placeholder="type 'help', 'run', or 'github'" autocomplete="off" />
+      </div>
+    </section>
+  </div>
+
+  <footer>© 2025 Faiq Jadoon — Notepad Hacker Edition</footer>
+
+  <script>
+    const bootLines = [
+      "[INIT] loading notepad_hacker_edition module...",
+      "[OK]  Tkinter GUI loaded.",
+      "[OK]  theme: black & neon green.",
+      "[OK]  autosave + shortcuts registered.",
+      "",
+      "Hacker notepad console ready."
+    ];
+
+    const projectContent = [
+      "",
+      "<span class='line title'>> project.summary()</span>",
+      "",
+      "<div class='term-img-wrap'><img src='hacker-notepad.png' alt='Notepad Hacker Edition UI' class='term-img'></div>",
+      "Name:  <span class='cmd'>Notepad Hacker Edition</span>",
+      "Stack: Python, Tkinter",
+      "",
+      "Description:",
+      "  A custom text editor that looks and feels like a hacker terminal. It uses",
+      "  a black + neon green theme, keyboard shortcuts, and optional autosave",
+      "  to create a smooth editing environment.",
+      "",
+      "Key features:",
+      "  • Hacker-themed dark UI (black + neon green)",
+      "  • Open, save, new file, and editing shortcuts",
+      "  • Adjustable font and size (perfect for monospace)",
+      "  • Cross-platform via standard Tkinter toolkit",
+      "",
+      "Useful commands:",
+      "  help   -> show this help",
+      "  run    -> simulate launching the notepad",
+      "  github -> open GitHub repository",
+      "  back   -> go to projects.sh",
+      "  home   -> go to home.sh"
+    ];
+
+    const bodyEl3 = document.getElementById("terminalBody");
+    const inputEl3 = document.getElementById("inputField");
+    const uptimeEl3 = document.getElementById("uptime");
+
+    function printLine3(text, cls) {
+      const div = document.createElement("div");
+      div.className = "line" + (cls ? " " + cls : "");
+      div.innerHTML = text;
+      bodyEl3.appendChild(div);
+      bodyEl3.scrollTop = bodyEl3.scrollHeight;
+    }
+
+    function bootSequence3() {
+      let i = 0;
+      function step() {
+        if (i < bootLines.length) {
+          printLine3(bootLines[i], "system");
+          i++;
+          setTimeout(step, 260);
+        } else {
+          projectContent.forEach(l => printLine3(l));
+        }
+      }
+      step();
+    }
+
+    function handleCommand3(raw) {
+      const input = raw.trim();
+      if (!input) return;
+
+      printLine3(
+        `<span class="prompt-frag">visitor@projects</span>:<span class="prompt-path">~/notepad_hacker_edition</span>$ <span class="cmd">${input}</span>`
+      );
+
+      if (input === "help") {
+        printLine3("", "");
+        printLine3("Commands:", "system");
+        printLine3("  help   - show this help", "system");
+        printLine3("  run    - simulate launching the app", "system");
+        printLine3("  github - open GitHub repo", "system");
+        printLine3("  clear  - clear this console", "system");
+        printLine3("  back   - go back to projects.sh", "system");
+        printLine3("  home   - go to home.sh", "system");
+        
+      } else if (input === "clear") {
+        bodyEl3.innerHTML = "";
+      } else if (input === "run") {
+        printLine3("", "");
+        printLine3("[RUN] opening Notepad Hacker Edition window...", "system");
+        printLine3("[RUN] applying neon-green theme...", "system");
+        printLine3("[RUN] ready for typing. 💻", "system");
+      } else if (input === "github") {
+        window.open("https://github.com/faiqjadoon26/notepad-_hacker_edition", "_blank");
+        printLine3("Opened GitHub repo in new tab.", "system");
+      } else if (input === "back") {
+        window.location.href = "projects.html";
+      } else if (input === "home") {
+        window.location.href = "index.html";
+    } else if (input === "resume") {
+        window.location.href = "resum.html";
+      } else {
+        printLine3(`<span class="line error">command not found: ${input}</span>`);
+      }
+    }
+
+    inputEl3.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const val = inputEl3.value;
+        inputEl3.value = "";
+        handleCommand3(val);
+      }
+    });
+
+    document.addEventListener("click", () => inputEl3.focus());
+
+    bootSequence3();
+
+    const start3 = Date.now();
+    setInterval(() => {
+      const diff = Math.floor((Date.now() - start3) / 1000);
+      const m = String(Math.floor(diff / 60)).padStart(2, "0");
+      const s = String(diff % 60).padStart(2, "0");
+      uptimeEl3.textContent = "session: " + m + ":" + s;
+    }, 1000);
+  </script>
+</body>
+</html>
+run
